@@ -261,8 +261,9 @@ function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto min-h-screen w-full max-w-[480px] px-5 pt-[calc(env(safe-area-inset-top)+2rem)] pb-12">
       {children}
-      <footer className="mt-8">
+      <footer className="mt-8 space-y-4">
         <ReviewButton />
+        <ContactInfo />
       </footer>
     </div>
   )
@@ -278,6 +279,19 @@ function Photo({ src, alt, tag, className = '', imgClass = 'object-center' }: { 
           {tag}
         </span>
       )}
+    </div>
+  )
+}
+
+function ContactInfo() {
+  return (
+    <div className="mt-8 border-t border-line pt-6 text-center text-[12.5px] leading-relaxed text-faint">
+      <p className="font-medium text-soft">Contact: +91 81492 81145</p>
+      <p className="mt-1">Address:</p>
+      <p>Shop No. 5, Pereira Shopping Center, Sweet Sahara Complex,</p>
+      <p>6, 7, St. Mary&apos;s Road, Pereira Nagar, Naigaon East,</p>
+      <p>Sarjamori, Vasai-Virar, Maharashtra 401208, India.</p>
+      <p className="mt-1">Coordinates: 19.3606249, 72.8460223</p>
     </div>
   )
 }
