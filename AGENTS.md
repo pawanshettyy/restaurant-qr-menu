@@ -1,12 +1,13 @@
-# figma-make-app
+# Sahyadri QR Menu
 
-React + Vite + Tailwind CSS project running inside Figma Make.
+A production-ready Vite + React + Tailwind application for the Sahyadri restaurant digital menu.
 
 ## Development Server
 
-A Vite development server is **already running** on `$PORT` (default 8443). You don't need to start it manually.
+Use the Vite dev server for local development.
 
-- Preview URL: The user can access the running app through the preview panel
+- Start: `npm run dev`
+- Preview: `npm run preview`
 - Hot reload: Changes to source files are reflected immediately
 
 ## Project Structure
@@ -18,7 +19,7 @@ This is the canonical project structure. Start with task-relevant files below. O
 - `src/index.css` - Global CSS entrypoint and Tailwind CSS v4 import
 - `index.html` - Vite HTML shell containing the `#root` element and loading `src/main.tsx`
 - `package.json` - Project dependencies and the Vite build, development, preview, and formatting scripts
-- `vite.config.ts` - Vite configuration with React, Tailwind CSS v4, and Figma Make plugins plus the `@` alias for `src`
+- `vite.config.ts` - Vite configuration with React and Tailwind CSS v4 plus the `@` alias for `src`
 - `.mise.toml` - Toolchain versions for Node.js and pnpm
 
 ## Dependencies
@@ -30,6 +31,6 @@ This is the canonical project structure. Start with task-relevant files below. O
 
 ## Styling
 
-This project uses **Tailwind CSS v4** through the `@tailwindcss/vite` plugin configured in `vite.config.ts`. `src/index.css` imports Tailwind with `@import 'tailwindcss';`. Use Tailwind utility classes directly in JSX and put global CSS or Tailwind v4 theme customization in `src/index.css`. This scaffold does not need a Tailwind config file or PostCSS config.
+This project uses **Tailwind CSS v4** through the `@tailwindcss/vite` plugin configured in `vite.config.ts`. `src/index.css` imports Tailwind with `@import 'tailwindcss';`. Use Tailwind utility classes directly in JSX and put global CSS or Tailwind v4 theme customization in `src/index.css`. This app does not need a Tailwind config file or PostCSS config.
 
 `src/main.tsx` imports `src/index.css`, so global font wiring belongs in `src/index.css`. Keep CSS `@import` statements first, then add any `@font-face` rules and font-family defaults there.

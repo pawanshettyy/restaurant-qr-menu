@@ -1,7 +1,8 @@
 {
-  "name": "figma-make-app",
+  "name": "sahyadri-qr-menu",
   "private": true,
   "version": "1.0.0",
+  "description": "Sahyadri restaurant digital QR menu",
   "type": "module",
   "scripts": {
     "dev": "vite",
