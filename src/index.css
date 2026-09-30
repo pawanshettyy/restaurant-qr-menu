@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --color-paper: #fbf5ea;
+  --color-card: #fffdf7;
+  --color-ink: #2a1f17;
+  --color-soft: #6f6055;
+  --color-faint: #8f8175;
+  --color-line: #ebe0cf;
+  --color-clay: #c65d34;
+  --color-clay-deep: #b34e28;
+  --color-blush: #fbeae0;
+}
+
+:root {
+  --diet-veg: #2f5d4a;
+  --diet-egg: #e0a03a;
+  --diet-chicken: #c65d34;
+  --diet-seafood: #3e6e70;
+  --diet-mutton: #7a2e2e;
+}
+
+html {
+  background: var(--color-paper);
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  -webkit-tap-highlight-color: transparent;
+}
+::selection {
+  background: #f2c9b3;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-clay);
+  outline-offset: 2px;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.45s ease both;
+}

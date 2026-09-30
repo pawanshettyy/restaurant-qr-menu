@@ -1,0 +1,10 @@
+{
+  "description": "Provides a mobile-optimized QR code menu for Sahyadri restaurant with detailed food and drink categories, age-verified drinks access, and easy navigation.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
