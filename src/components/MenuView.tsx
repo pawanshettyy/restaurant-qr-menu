@@ -6,18 +6,29 @@ import Navbar, { SORT_FNS, type Filters, type MenuItem } from "./navbar";
 export default function MenuView({ items }: { items: MenuItem[] }) {
   const [filters, setFilters] = useState<Filters>({
     category: "All items",
-    sort: "default",
+    sort: "veg",
     query: "",
   });
 
   const visible = items
-    .filter((i) => filters.category === "All items" || i.category === filters.category)
+    .filter(
+      (i) =>
+        filters.category === "All items" ||
+        (filters.category === "Mutton" ? i.type === "mutton" : i.category === filters.category)
+    )
     .filter((i) => i.name.toLowerCase().includes(filters.query.toLowerCase()))
+    .filter(
+      (i) =>
+        filters.category === "Mutton" ||
+        filters.sort === "price_low_to_high" ||
+        filters.sort === "price_high_to_low" ||
+        i.type === filters.sort
+    )
     .sort(SORT_FNS[filters.sort]);
 
   return (
     <div className="mx-auto min-h-screen max-w-md bg-[#F4F1EE]">
-      <Navbar onChange={setFilters} />
+      <Navbar items={items} onChange={setFilters} />
 
       <main className="space-y-3 px-4 py-4">
         {visible.length === 0 && (

@@ -7,13 +7,12 @@ export type MenuItem = {
   no: number;
   name: string;
   category: string;
-  type: "veg" | "nonveg";
+  type: "veg" | "chicken" | "egg" | "seafood" | "mutton";
   price: number | null; // null = APS (as per size)
   popular?: boolean;
 };
 
 export const CATEGORIES: string[] = [
-  "All items",
   "Soup",
   "Starter",
   "Tandoor Se",
@@ -26,17 +25,19 @@ export const CATEGORIES: string[] = [
 ];
 
 export const SORTS = [
-  { key: "default", label: "Default" },
-  { key: "popularity", label: "Popularity" },
-  { key: "price_low_to_high", label: "Price: Low to High" },
-  { key: "price_high_to_low", label: "Price: High to Low" },
+  { key: "veg", label: "Veg" },
+  { key: "chicken", label: "Chicken" },
+  { key: "egg", label: "Egg" },
+  { key: "seafood", label: "Seafood" },
+  { key: "mutton", label: "Mutton" },
 ] as const;
 
 export type SortKey = (typeof SORTS)[number]["key"];
+export type PriceSortKey = "price_low_to_high" | "price_high_to_low";
 
 export type Filters = {
   category: string;
-  sort: SortKey;
+  sort: SortKey | PriceSortKey;
   query: string;
 };
 
@@ -49,22 +50,29 @@ const byPrice = (dir: 1 | -1) => (a: MenuItem, b: MenuItem): number => {
 };
 
 // keys must match the keys in SORTS
-export const SORT_FNS: Record<SortKey, (a: MenuItem, b: MenuItem) => number> = {
-  default: (a, b) => a.no - b.no,
-  popularity: (a, b) =>
-    Number(!!b.popular) - Number(!!a.popular) || a.no - b.no,
+export const SORT_FNS: Record<SortKey | PriceSortKey, (a: MenuItem, b: MenuItem) => number> = {
+  veg: (a, b) => a.no - b.no,
+  chicken: (a, b) => a.no - b.no,
+  egg: (a, b) => a.no - b.no,
+  seafood: (a, b) => a.no - b.no,
+  mutton: (a, b) => a.no - b.no,
   price_low_to_high: byPrice(1),
   price_high_to_low: byPrice(-1),
 };
 
 type NavbarProps = {
+  items: MenuItem[];
   onChange?: (filters: Filters) => void;
 };
 
-export default function Navbar({ onChange }: NavbarProps) {
+export default function Navbar({ items, onChange }: NavbarProps) {
   const [category, setCategory] = useState<string>("All items");
-  const [sort, setSort] = useState<SortKey>("default");
+  const [sort, setSort] = useState<SortKey | PriceSortKey>("veg");
   const [query, setQuery] = useState<string>("");
+  const [showPriceSorts, setShowPriceSorts] = useState(false);
+  const categories = CATEGORIES.filter((currentCategory) =>
+    items.some((item) => item.category === currentCategory)
+  );
 
   const update = (next: Partial<Filters>): void =>
     onChange?.({ category, sort, query, ...next });
@@ -78,7 +86,7 @@ export default function Navbar({ onChange }: NavbarProps) {
       </div>
 
       {/* Search */}
-      <label className="flex items-center gap-2 rounded-full bg-white px-4 py-3 shadow-sm">
+      <div className="relative flex items-center gap-2 rounded-full bg-white px-4 py-3 shadow-sm">
         <Search size={18} className="text-gray-400" />
         <input
           value={query}
@@ -89,12 +97,42 @@ export default function Navbar({ onChange }: NavbarProps) {
           placeholder="Search the menu"
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
         />
-        <SlidersHorizontal size={18} className="text-gray-500" />
-      </label>
+        <button
+          type="button"
+          aria-label="Sort by price"
+          aria-expanded={showPriceSorts}
+          onClick={() => setShowPriceSorts((visible) => !visible)}
+          className="text-gray-500 transition hover:text-[#C0392B]"
+        >
+          <SlidersHorizontal size={18} />
+        </button>
+        {showPriceSorts && (
+          <div className="absolute right-0 top-full z-30 mt-2 w-44 rounded-xl bg-white p-1 shadow-lg ring-1 ring-black/5">
+            {[
+              ["price_low_to_high", "Price: Low to High"],
+              ["price_high_to_low", "Price: High to Low"],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  setSort(key as PriceSortKey);
+                  update({ sort: key as PriceSortKey });
+                  setShowPriceSorts(false);
+                }}
+                className={`block w-full rounded-lg px-3 py-2 text-left text-xs transition hover:bg-[#F4F1EE]
+                  ${sort === key ? "font-semibold text-[#C0392B]" : "text-gray-700"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Category */}
       <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {CATEGORIES.map((c) => (
+        {categories.map((c) => (
           <button
             key={c}
             aria-pressed={category === c}
@@ -114,8 +152,8 @@ export default function Navbar({ onChange }: NavbarProps) {
         ))}
       </div>
 
-      {/* Sort */}
-      <div className="grid grid-cols-4 border-b border-gray-200">
+      {/* Food type */}
+      <div className="grid grid-cols-5 border-b border-gray-200">
         {SORTS.map(({ key, label }) => (
           <button
             key={key}

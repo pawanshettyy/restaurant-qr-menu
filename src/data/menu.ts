@@ -1,4 +1,4 @@
-import type { MenuItem } from "@/components/MenuView";
+import type { MenuItem } from "@/components/navbar";
 
 // [item number on the printed menu, name, price]
 // price === null means "APS" (as per size)
@@ -27,7 +27,7 @@ export const items: MenuItem[] = [
     [12, "Lemon Coriander Soup", 140],
     [13, "Eleven 45 Spl. Veg Soup", 150],
   ]),
-  ...make("Soup", "nonveg", [
+  ...make("Soup", "chicken", [
     [14, "Chicken Manchow Soup", 170],
     [15, "Chicken Clear Soup", 160],
     [16, "Chicken Sweetcorn Soup", 180],
@@ -72,7 +72,7 @@ export const items: MenuItem[] = [
     [51, "Veg Kurkure", 300],
   ]),
   // Egg starters (52-61)
-  ...make("Starter", "nonveg", [
+  ...make("Starter", "egg", [
     [52, "Boiled Egg", 60],
     [53, "Boiled Egg Tawa Fry", 80],
     [54, "Egg Half Fry", 60],
@@ -85,7 +85,7 @@ export const items: MenuItem[] = [
     [61, "Egg Sezwan", 220],
   ]),
   // Chicken starters (62-87)
-  ...make("Starter", "nonveg", [
+  ...make("Starter", "chicken", [
     [62, "Chicken Oil Fry", 240],
     [63, "Chicken Koliwada", 280],
     [64, "Chicken Pakoda", 260],
@@ -114,7 +114,7 @@ export const items: MenuItem[] = [
     [87, "Chicken Apple", 320],
   ]),
   // Mutton starters (88-94)
-  ...make("Starter", "nonveg", [
+  ...make("Starter", "mutton", [
     [88, "Mutton Ghee Roast", 380],
     [89, "Mutton Jeera", 350],
     [90, "Mutton Khima", 350],
@@ -124,7 +124,7 @@ export const items: MenuItem[] = [
     [94, "Mutton Pepper Dry", 380],
   ]),
   // Sea food starters (95-121)
-  ...make("Starter", "nonveg", [
+  ...make("Starter", "seafood", [
     [95, "Bangda Tawa Fry", null],
     [96, "Bangda Masala Fry", null],
     [97, "Bangda Fry", null],
@@ -155,7 +155,7 @@ export const items: MenuItem[] = [
   ]),
  
   // ───────────── TANDOOR SE ─────────────
-  ...make("Tandoor Se", "nonveg", [
+  ...make("Tandoor Se", "chicken", [
     [122, "Chicken Tandoori (Half)", 260],
     [123, "Chicken Tandoori (Full)", 460],
     [124, "Chi Pahadi Tandoori (Half)", 280],
@@ -240,7 +240,7 @@ export const items: MenuItem[] = [
     [199, "Tomato Bhurji", 250],
   ]),
   // Chicken main course (200-229)
-  ...make("Main Course", "nonveg", [
+  ...make("Main Course", "chicken", [
     [200, "Chicken Masala", 270],
     [201, "Chicken Sukkha", 280],
     [202, "Chicken Kolhapuri", 270],
@@ -273,7 +273,7 @@ export const items: MenuItem[] = [
     [229, "Chicken Laziz", 280],
   ]),
   // Mutton main course (230-237)
-  ...make("Main Course", "nonveg", [
+  ...make("Main Course", "mutton", [
     [230, "Mutton Masala", 400],
     [231, "Mutton Sukkha", 460],
     [232, "Mutton Kolhapuri", 460],
@@ -284,12 +284,14 @@ export const items: MenuItem[] = [
     [237, "Mutton Handi (Half)", 450],
   ]),
   // Sea food main course (238-243)
-  ...make("Main Course", "nonveg", [
+  ...make("Main Course", "seafood", [
     [238, "Bangda Masala", null],
     [239, "Pomfret Masala", null],
     [240, "Surmai Masala", null],
     [241, "Halwa Masala", null],
     [242, "Crab Masala", null],
+  ]),
+  ...make("Main Course", "egg", [
     [243, "Egg Tawa Masala", 180],
   ]),
  
@@ -332,16 +334,28 @@ export const items: MenuItem[] = [
     [274, "Veg Hyderabadi Biryani", 270],
     [275, "Paneer Dum Biryani", 300],
   ]),
-  ...make("Basmati Ki Bahar", "nonveg", [
+  ...make("Basmati Ki Bahar", "egg", [
     [276, "Egg Biryani", 240],
+  ]),
+  ...make("Basmati Ki Bahar", "chicken", [
     [277, "Chicken Biryani", 280],
+  ]),
+  ...make("Basmati Ki Bahar", "mutton", [
     [278, "Mutton Biryani", 380],
+  ]),
+  ...make("Basmati Ki Bahar", "seafood", [
     [279, "Prawns Biryani", 350],
+  ]),
+  ...make("Basmati Ki Bahar", "chicken", [
     [280, "Chicken Dum Biryani", 300],
     [281, "Chicken Hyderabadi Biryani", 300],
     [282, "Chicken Tikka Biryani", 310],
+  ]),
+  ...make("Basmati Ki Bahar", "mutton", [
     [283, "Mutton Dum Biryani", 390],
     [284, "Mutton Hyderabadi Biryani", 410],
+  ]),
+  ...make("Basmati Ki Bahar", "chicken", [
     [285, "Chicken Afghani Biryani", 300],
     [286, "Chicken Calcutta Biryani", 300],
   ]),
@@ -357,7 +371,7 @@ export const items: MenuItem[] = [
     [293, "Paneer 65", 250],
     [294, "Veg Lollypop Dry/Gravy", 230],
   ]),
-  ...make("Chinese Ka Tadka", "nonveg", [
+  ...make("Chinese Ka Tadka", "chicken", [
     [295, "Chi. Chilly Dry / Gravy (Full)", 260],
     [296, "Chi. Chilly Dry (Half)", 150],
     [297, "Chi. Lollypop Dry (Full)", 260],
@@ -386,7 +400,7 @@ export const items: MenuItem[] = [
     [316, "Veg Tripple Noodles", 250],
     [317, "Veg Kolhapuri Rice", 280],
   ]),
-  ...make("Chinese Rice & Noodles", "nonveg", [
+  ...make("Chinese Rice & Noodles", "chicken", [
     [318, "Chicken Fried Rice", 220],
     [319, "Chicken Sezwan Fried Rice", 230],
     [320, "Chi Tripple Sezwan Fried Rice", 290],
@@ -394,9 +408,15 @@ export const items: MenuItem[] = [
     [322, "Chi Hongkong Fried Rice", 290],
     [323, "Chicken Chopper Fried Rice", 310],
     [324, "Chicken Hakka Noodles", 250],
-    [325, "Chicken Sezwan Noodles", 250],
-    [326, "Chi Tripple Sezwan Noodles", 290],
+    [326, "Chicken Sezwan Noodles", 250],
+  ]),
+  ...make("Chinese Rice & Noodles", "egg", [
     [327, "Egg Fried Rice", 190],
+  ]),
+  ...make("Chinese Rice & Noodles", "seafood", [
+    [328, "Prawns Fried Rice", 350],
+  ]),
+  ...make("Chinese Rice & Noodles", "chicken", [
     [328, "Prawns Fried Rice", 350],
     [329, "Chicken Sanghai Rice", 350], // TODO: price is hidden behind the photo on the printed menu; 350 is assumed, please verify
     [330, "Chicken Boxer Rice", 350],
