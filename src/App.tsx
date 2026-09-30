@@ -19,11 +19,10 @@ import {
   Wine,
   X,
 } from 'lucide-react'
-import homeImg from './assets/home.png'
 import { DIET_META, DRINKS, FOOD, type Category, type Diet, type Item, type Price } from './menu'
 
 const IMG = {
-  hero: homeImg,
+  hero: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/home.png',
   food: 'https://images.unsplash.com/photo-1789990642068-0840cf55e1cf?w=900&h=500&fit=crop&auto=format',
   bar: 'https://images.unsplash.com/photo-1778104960251-b1d82ac92ee9?w=900&h=500&fit=crop&auto=format',
 }
