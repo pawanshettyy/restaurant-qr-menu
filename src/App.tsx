@@ -268,10 +268,33 @@ function Shell({ children }: { children: ReactNode }) {
   )
 }
 
-function Photo({ src, alt, tag, className = '', imgClass = 'object-center' }: { src: string; alt: string; tag?: string; className?: string; imgClass?: string }) {
+function Photo({
+  src,
+  alt,
+  tag,
+  className = '',
+  imgClass = 'object-center',
+  loading = 'lazy',
+}: {
+  src: string
+  alt: string
+  tag?: string
+  className?: string
+  imgClass?: string
+  loading?: 'eager' | 'lazy'
+}) {
   return (
     <div className={`relative overflow-hidden rounded-[28px] bg-[#4a3a2e] ${className}`}>
-      <img src={src} alt={alt} className={`size-full object-cover ${imgClass}`} />
+      <img
+        src={src}
+        alt={alt}
+        loading={loading}
+        decoding="async"
+        className={`size-full object-cover ${imgClass}`}
+        onError={(event) => {
+          event.currentTarget.style.display = 'none'
+        }}
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
       {tag && (
         <span className="absolute bottom-3.5 left-4 text-[10px] font-medium tracking-[0.14em] text-white uppercase">
@@ -311,7 +334,14 @@ function Landing() {
         </div>
         <h1 className="mt-4 font-display text-[44px] leading-none font-medium">Sahyadri</h1>
         <p className="mt-1.5 text-[11px] font-medium tracking-[0.1em] text-clay uppercase">Family Restaurant &amp; Bar</p>
-        <Photo src={IMG.hero} alt="Sahyadri dining hall with teal banquettes and long laid tables" tag="Naigaon · Palghar" className="mt-6 h-[260px]" imgClass="object-[50%_62%]" />
+        <Photo
+          src={IMG.hero}
+          alt="Sahyadri dining hall with teal banquettes and long laid tables"
+          tag="Naigaon · Palghar"
+          className="mt-6 h-[260px]"
+          imgClass="object-[50%_62%]"
+          loading="eager"
+        />
         <h2 className="mt-8 text-center font-display text-[34px] leading-none font-medium">Welcome to our table</h2>
         <p className="mx-auto mt-3 max-w-[300px] text-center text-[13px] leading-relaxed text-soft">
           Season-led Indian cooking, familiar flavours and a little theatre.
