@@ -310,10 +310,9 @@ function ContactInfo() {
     <div className="mt-8 border-t border-line pt-6 text-center text-[12.5px] leading-relaxed text-faint">
       <p className="font-medium text-soft">Contact: +91 81492 81145</p>
       <p className="mt-1">Address:</p>
-      <p>Shop No. 5, Pereira Shopping Center, Sweet Sahara Complex,</p>
-      <p>6, 7, St. Mary&apos;s Road, Pereira Nagar, Naigaon East,</p>
+      <p>Shop No. 5,6,7 Pereira Shopping Center, Sweet Sahara Complex,</p>
+      <p>St. Mary&apos;s Road, Pereira Nagar, Naigaon East,</p>
       <p>Sarjamori, Vasai-Virar, Maharashtra 401208, India.</p>
-      <p className="mt-1">Coordinates: 19.3606249, 72.8460223</p>
     </div>
   )
 }
