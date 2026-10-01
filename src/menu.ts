@@ -517,6 +517,310 @@ export const FOOD: Category[] = [
   },
 ]
 
+const acPriceUpdates = (text: string) =>
+  new Map(
+    lines(text).map((line) => {
+      const separator = line.indexOf('=')
+      return [line.slice(0, separator).trim(), parsePrices(line.slice(separator + 1).trim())] as const
+    }),
+  )
+
+const AC_FOOD_PRICES: Record<string, Map<string, Price[] | null>> = {
+  soup: acPriceUpdates(`
+Sweet Corn Soup = 180
+Hot N Sour Soup = 180
+Veg Manchow Soup = 180
+Veg Clear Soup = 180
+Veg Talmen Soup = 200
+Cream Of Tomato Soup = 180
+Cream Of Palak Soup = 180
+Cream Of Mushroom Soup = 220
+Cream Of Veg Soup = 200
+Veg Lung Fung Soup = 220
+Veg Tuppa Soup = 200
+Lemon Coriander Soup = 180
+Eleven 45 Spl. Veg Soup = 200
+Chicken Manchow Soup = 210
+Chicken Clear Soup = 200
+Chicken Sweetcorn Soup = 220
+Hot N Sour Chicken Soup = 220
+Chicken Mushroom Soup = 200
+Chicken Tuppa Soup = 200`),
+  starter: acPriceUpdates(`
+Chana Garlic Oil Fry = 230
+Boiled Chana = 190
+Kaju Butter Fry = 290
+Cheese Cubes = 160
+Green Peas Butter Fry = 220
+French Fries = 220
+Paneer Pakoda = 240
+Cheese Pakoda = 280
+Paneer Koliwada = 240
+Chana Koliwada = 230
+Veg Kurkure = 320
+Veg 65 = 240
+Veg Chilly = 240
+Veg Manchurian = 240
+Veg Crispy = 270
+Veg Lollypop = 270
+Veg Spring Roll = 390
+Paneer Chilly = Full 310 / Half 200
+Paneer Manchurian = 300
+Paneer 65 = 300
+Paneer Sezwan = 300
+Paneer Crispy = 300
+Gobi Manchurian = 300
+Veg Seekh Kabab = 240
+Paneer Tikka = 340
+Paneer Pahadi Kabab = 320
+Paneer Malai Tikka = 380
+Paneer Lassuni Tikka = 380
+Veg Lassuni Palak Kabab = 380
+Hara Bhara Kabab = 320
+Boiled Egg = 80
+Boiled Egg Tawa Fry = 100
+Egg Half Fry = 80
+Egg Omlet = 100
+Egg Burji = 130
+Egg Pakoda = 160
+Egg Koliwada = 160
+Egg Masala Fry / Egg Curry = 240
+Egg Chilly = 240
+Egg Sezwan = 260
+Chicken Oil Fry = 280
+Chicken Koliwada = 320
+Chicken Pakoda = 300
+Chicken Roast = Full 490 / Half 310
+Chicken Ghree Roast = 330
+Chicken Jeera = 330
+Chicken Chilly = Full 300
+Chicken Lollypop = Full 320 / Half 200
+Chicken Manchurian = 300
+Chicken 65 = Full 300 / Half 190
+Chicken Sezwan = 300
+Chicken Garlic = 340
+Chicken Crispy = Full 340
+Chicken Sathe = 330
+Chicken Pepper Dry = 340
+Chicken Tawa = 330
+Chicken Spring Roll = 390
+Chicken Sanghai = 320
+Chicken Yeki Topi = 340
+Chicken Hitler = 340
+Chicken Marathe = 340
+Chicken Lollypop Masala Dry = 360
+Chicken Apple = 360
+Ghee Roast = 420
+Jeera = 390
+Khima = 390
+Bhuna = 420
+Seekh Kabab = 440
+Rogan Josh = 420
+Pepper Dry = 420
+Fish Fingers = 390`),
+  'tandoor-se': acPriceUpdates(`
+Chicken Tandoori = Half 300 / Full 500
+Chi Pahadi Tandoori = Half 340 / Full 520
+Chi Kalimiri Tandoori = Half 320 / Full 530
+Chi Sezwan Tandoori = Half 330 / Full 530
+Chi Lollypop Tandoori = 380
+Chicken Tikka = 330
+Chicken Malai Tikka = 370
+Chicken Liver / Tita Tandoori = 320
+Chicken Reshmi Kabab = 350
+Chicken Pahadi Kabab = 340
+Chicken Kalimiri Kabab = 350
+Chicken Seekh Kabab = 350
+Chicken Tangdi Kabab = 2 Pcs 420 / 1 Pc 240
+Chicken Lassuni Kabab = 330
+Chicken Plater = 1150
+Chicken Sunheri Kabab = 350
+Chicken Multani Kabab = 380
+Chicken Achari Kabab = 320
+Chicken Banjara Kabab = 340
+Chicken Angara Kabab = 360
+Chicken Rozali Kabab = 360
+Chicken Boti Kabab = 300
+Chicken Kalmi = 400
+Chicken Basthuni Kabab = 350
+Chicken Janvi Kabab = 350
+Chicken Shikari Kabab = 350
+Khecha Chicken Tikka = 350`),
+  'main-course': acPriceUpdates(`
+Dal Fry = 220
+Dal Tadka = 230
+Bhendi Masala = 270
+Bhendi Do Pyaza = 290
+Baingan Masala = 270
+Alu Palak = 240
+Alu Gobi = 240
+Alu Jeera = 220
+Alu Mutter = 240
+Chana Masala = 240
+Mix Veg = 260
+Veg Kolhapuri = 290
+Veg Kadai = 300
+Veg Hyderabadi = 300
+Veg Kofta = 300
+Veg Tawa Masala = 310
+Veg Handi = 310
+Veg Makhanwala = 270
+Veg Jalfrezi = 280
+Veg Jaipuri = 280
+Veg Patiyala = 310
+Gobi Amritsari = 340
+Veg Nawabi = 320
+Methi Mutter Masala = 320
+Veg Jarina = 320
+Veg Maharaja = 340
+Veg Rajasthani = 320
+Paneer Tikka Masala = 310
+Paneer Makhanwala = 290
+Paneer Kolhapuri = 290
+Paneer Bhurji = 320
+Paneer Palak = 300
+Paneer Mutter = 300
+Paneer Kadai = 320
+Paneer Handi = 340
+Paneer Amritsari = 340
+Paneer Laziz = 340
+Paneer Lajabab = 350
+Paneer Moghlai = 330
+Paneer Lasuni Palak = 330
+Mushroom Masala = 320
+Paneer Kofta = 350
+Malai Methi Mutter = 300
+Kaju Masala = 390
+Dum Alu Punjabi = 320
+Tomato Bhurji = 290
+Egg Tawa Masala = 200
+Chicken Masala = 310
+Chicken Sukkha = 320
+Chicken Kolhapuri = 310
+Chicken Hyderabadi = 310
+Chicken Tikka Masala = 320
+Chicken Liver Masala = 300
+Chicken Kheema = 320
+Chicken Tawa Masala = 340
+Chicken Kadai = Full 650 / Half 390
+Chicken Handi = Full 650 / Half 390
+Butter Chicken = Full 650 / Half 400
+Murg Mussallam = Full 750 / Half 450
+Chicken Malwani = Full 750 / Half 450
+Chicken Agri = Full 750 / Half 450
+Chicken Angara Kabab Masala = 400
+Chicken Kabab Kulchan Masala = 400
+Chicken Kalimiri Masala = 360
+Chicken Afghani = 340
+Chicken Moglai = 340
+Chicken Jarina = 340
+Chicken Rara = 340
+Chicken Navabi Masala = 340
+Chicken Do Pyaza = 310
+Chicken Laziz = 320
+Mutton Masala = 440
+Mutton Sukkha = 500
+Mutton Kolhapuri = 500
+Mutton Kheema = 500
+Mutton Kadai = Full 850 / Half 500
+Mutton Handi = Full 830 / Half 490
+Bangda Masala = APS
+Pomfret Masala = APS
+Surmai Masala = APS
+Halwa Masala = APS
+Crab Masala = APS`),
+  'roti-ka-khazana': acPriceUpdates(`
+Roti = 30
+Butter Roti = 40
+Naan = 50
+Butter Naan = 60
+Paratha = 55
+Butter Paratha = 60
+Cheese Naan = 200
+Garlic Naan = 120
+Cheese Garlic Naan = 220
+Butter Cheese Garlic Naan = 230
+Kulcha = 50
+Butter Kulcha = 60
+Alu Paratha = 160
+Stuff Paratha = 200
+Paneer Paratha = 200
+Garlic Kulcha = 90`),
+  'basmati-ki-bahar': acPriceUpdates(`
+Steam Rice = 160
+Steam Rice Half = 110
+Jeera Rice = 190
+Biryani Rice = 180
+Ghee Rice = 130
+Veg Pulav = 240
+Veg Biryani = 260
+Veg Tawa Pulav = 280
+Dal Khichdi = 240
+Dal Palak Khichdi = 260
+Paneer Pulav = 300
+Green Peas Pulav = 290
+Paneer Biryani = 330
+Veg Dum Biryani = 300
+Veg Hyderabadi Biryani = 320
+Paneer Dum Biryani = 350
+Egg Biryani = 240
+Chicken Biryani = 280
+Mutton Biryani = 380
+Prawns Biryani = 350
+Chicken Dum Biryani = 300
+Chicken Hyderabadi Biryani = 300
+Chicken Tikka Biryani = 310
+Mutton Dum Biryani = 390
+Mutton Hyderabadi Biryani = 410
+Chicken Afghani Biryani = 300
+Chicken Calcutta Biryani = 300`),
+  'chinese-rice-noodles': acPriceUpdates(`
+Veg Fried Rice = 220
+Veg Sezwan Fried Rice = 240
+Veg Tripple Sezwan Fried Rice = 290
+Veg Hong Kong Fried Rice = 280
+Veg Singapore Fried Rice = 280
+Veg Chopper Fried Rice = 290
+Veg Manchurian Fried Rice = 320
+Veg Combination Fried Rice = 280
+Mushroom Fried Rice = 290
+Veg Hakka Noodles = 240
+Veg Sezwan Noodles = 270
+Veg Tripple Noodles = 290
+Veg Kolhapuri Rice = 320
+Chicken Fried Rice = 260
+Chicken Sezwan Fried Rice = 270
+Chi Tripple Sezwan Fried Rice = 330
+Chi Manchurian Fried Rice = 330
+Chi Hongkong Fried Rice = 330
+Chicken Chopper Fried Rice = 350
+Chicken Hakka Noodles = 290
+Chicken Sezwan Noodles = 290
+Egg Fried Rice = 230
+Prawns Fried Rice = 390
+Chicken Sanghai Rice = 300
+Chicken Boxer Rice = 390`),
+  'khane-ke-saath': acPriceUpdates(`
+Green Salad = 150
+Plain Curd = 110
+Veg Raita = 130
+Roasted Papad = 40
+Fried Papad = 40
+Masala Papad = 100`),
+}
+
+for (const category of FOOD) {
+  const updates = AC_FOOD_PRICES[category.slug]
+  for (const group of category.groups) {
+    for (const item of group.items) {
+      const nonAcPrices = item.prices
+      item.nonAcPrices = nonAcPrices
+      const prices = updates?.get(item.name)
+      if (prices !== undefined) item.prices = prices
+    }
+  }
+}
+
 export interface DrinkSection {
   slug: string
   title: string
@@ -536,7 +840,7 @@ const barItems = (text: string) =>
         desc,
         prices: values.split(',').map((entry) => {
           const [label, value] = entry.split(':')
-          return { label: label === 'NIP' ? '180 ml' : label, value: Number(value) }
+          return { label: label === 'NIP' ? '180 ml' : label === 'Price' ? undefined : label, value: Number(value) }
         }),
       }
     })

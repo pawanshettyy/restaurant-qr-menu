@@ -455,7 +455,7 @@ function FoodListing({ category }: { category: Category }) {
         ))}
         {!groups.length && <p className="py-10 text-center text-sm text-faint">Nothing matches “{q}”.</p>}
         <Note title="A note from our kitchen">
-          Prices are in ₹. APS means as per size - please ask your server. Most dishes can be adjusted for heat; tell us about nuts, dairy, gluten or other allergens.
+          Food once ordered cannot be cancelled. Rates are subject to change without prior notice. All government taxes are applicable. Prices are in ₹. APS means as per size - please ask your server. Most dishes can be adjusted for heat; tell us about nuts, dairy, gluten or other allergens.
         </Note>
       </div>
     </Shell>
