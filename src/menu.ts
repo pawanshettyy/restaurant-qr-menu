@@ -8,8 +8,10 @@ export interface Price {
 export interface Item {
   name: string
   desc?: string
-  /** null => "APS" (as per size) */
+  /** null => "APS" (as per size). These are the AC prices. */
   prices: Price[] | null
+  /** Non-AC prices; when undefined the AC prices apply to both sections. */
+  nonAcPrices?: Price[] | null
   chef?: boolean
   diet: Diet
 }
@@ -43,20 +45,24 @@ export const DIET_META: Record<Diet, { title: string; tagline: string; color: st
  * Line format:  Name [| note] [*] = 140
  *               Name = Half 270 / Full 450
  *               Name = APS
+ *               Name = 140 ; 120          (AC ; Non-AC - omit "; ..." if same)
  * A trailing "*" after the name marks Chef's Pick.
  */
+function parsePrices(text: string): Price[] | null {
+  if (text.toUpperCase() === 'APS') return null
+  return text.split('/').map((part) => {
+    const m = part.trim().match(/^(?:(.*?)\s+)?(\d+)$/)
+    return { label: m?.[1] || undefined, value: Number(m?.[2]) }
+  })
+}
+
 function parseLine(line: string, diet: Diet): Item {
   const [left, right] = line.split('=').map((s) => s.trim())
   const chef = /\*$/.test(left)
   const [name, desc] = left.replace(/\*$/, '').split('|').map((s) => s.trim())
-  let prices: Price[] | null = null
-  if (right.toUpperCase() !== 'APS') {
-    prices = right.split('/').map((part) => {
-      const m = part.trim().match(/^(?:(.*?)\s+)?(\d+)$/)
-      return { label: m?.[1] || undefined, value: Number(m?.[2]) }
-    })
-  }
-  return { name, desc, prices, chef, diet }
+  const [ac, nonAc] = right.split(';').map((s) => s.trim())
+  const prices = parsePrices(ac)
+  return nonAc === undefined ? { name, desc, prices, chef, diet } : { name, desc, prices, nonAcPrices: parsePrices(nonAc), chef, diet }
 }
 
 const lines = (text: string) =>
@@ -516,67 +522,141 @@ export interface DrinkSection {
   title: string
   tagline: string
   tone: 'maroon' | 'green'
-  items: { name: string; desc: string; price: number; chef?: boolean }[]
+  items: { name: string; desc: string; prices: Price[]; nonAcPrices?: Price[]; chef?: boolean }[]
 }
 
+const barItems = (text: string) =>
+  text
+    .trim()
+    .split('\n')
+    .map((line) => {
+      const [name, desc, values] = line.split('|')
+      return {
+        name,
+        desc,
+        prices: values.split(',').map((entry) => {
+          const [label, value] = entry.split(':')
+          return { label: label === 'NIP' ? '180 ml' : label, value: Number(value) }
+        }),
+      }
+    })
+
+const barSection = (slug: string, title: string, tagline: string, tone: 'maroon' | 'green', text: string): DrinkSection => ({
+  slug,
+  title,
+  tagline: tagline.replace('NIP 180 ml', '180 ml'),
+  tone,
+  items: barItems(text),
+})
+
 export const DRINKS: DrinkSection[] = [
-  {
-    slug: 'mehfil-signatures',
-    title: 'Mehfil Signatures',
-    tagline: 'House cocktails · 60 ml pour',
-    tone: 'maroon',
-    items: [
-      { name: 'Saffron Highball', desc: 'Indian whisky, saffron cordial, soda and grapefruit', price: 675, chef: true },
-      { name: 'Jamun Gimlet', desc: 'Dry gin, jamun, lime and black salt', price: 625 },
-      { name: 'Monsoon Negroni', desc: 'Gin, kokum vermouth and bitter orange', price: 695 },
-      { name: 'Mango Chilli Margarita', desc: 'Tequila, raw mango, chilli and agave', price: 675 },
-    ],
-  },
-  {
-    slug: 'wine',
-    title: 'Wine by the Glass',
-    tagline: '150 ml · Ask for today’s bottle list',
-    tone: 'maroon',
-    items: [
-      { name: 'Grover Zampa Soirée Brut', desc: 'Nashik · citrus, brioche, fine bubbles', price: 725 },
-      { name: 'Sula Riesling', desc: 'Nashik · off-dry, lime and white blossom', price: 595 },
-      { name: 'Fratelli Sette', desc: 'Akluj · Sangiovese blend, cherry and cedar', price: 795, chef: true },
-    ],
-  },
-  {
-    slug: 'spirits',
-    title: 'Indian Spirits',
-    tagline: '30 ml · Served neat, on ice or with a mixer',
-    tone: 'maroon',
-    items: [
-      { name: 'Amrut Fusion Single Malt', desc: 'Bengaluru · malt, cacao and soft smoke', price: 625 },
-      { name: 'Paul John Bold', desc: 'Goa · honey, pepper and coastal peat', price: 595 },
-      { name: 'Stranger & Sons Gin', desc: 'Goa · pepper, coriander and citrus peel', price: 525 },
-      { name: 'Maka Zai Gold Rum', desc: 'Goa · praline, oak and warm spice', price: 475 },
-    ],
-  },
-  {
-    slug: 'beer-cider',
-    title: 'Beer & Cider',
-    tagline: 'Chilled bottles and cans',
-    tone: 'maroon',
-    items: [
-      { name: 'Bira 91 White', desc: 'Wheat beer · 330 ml', price: 395 },
-      { name: 'Simba Stout', desc: 'Coffee, cacao · 330 ml', price: 425 },
-      { name: 'BeeYoung Crafted Strong', desc: 'Crisp lager · 500 ml', price: 445 },
-      { name: 'Moonshine Apple Cider', desc: 'Dry, bright and gently sparkling · 330 ml', price: 425 },
-    ],
-  },
-  {
-    slug: 'zero-proof',
-    title: 'Zero Proof',
-    tagline: 'Layered pours without alcohol',
-    tone: 'green',
-    items: [
-      { name: 'Kokum Fizz', desc: 'Kokum, curry leaf, lime and sparkling water', price: 325, chef: true },
-      { name: 'Nimbu & Basil Cooler', desc: 'Gondhoraj lime, basil, tonic and sea salt', price: 295 },
-      { name: 'Roasted Pineapple Swizzle', desc: 'Pineapple, tamarind, chilli and soda', price: 325 },
-      { name: 'Masala Cola', desc: 'House cola, toasted spice and fresh citrus', price: 245 },
-    ],
-  },
+  barSection('scotch', 'Scotch', 'NIP 180 ml · 90 ml · 60 ml · 30 ml', 'maroon', `
+Dewar's 12 Year|Scotch|NIP:1490,90 ml:750,60 ml:505,30 ml:260
+Black Dog 12 Year|Scotch|NIP:1305,90 ml:660,60 ml:445,30 ml:230
+Teacher's|Scotch|NIP:1125,90 ml:570,60 ml:385,30 ml:200
+Black & White|Scotch|NIP:1085,90 ml:550,60 ml:375,30 ml:195
+Ballantine|Scotch|NIP:1125,90 ml:570,60 ml:385,30 ml:200
+J&B|Scotch|NIP:1075,90 ml:545,60 ml:370,30 ml:190
+Red Label|Scotch|NIP:1075,90 ml:545,60 ml:370,30 ml:190
+Black Dog Centenary|Scotch|NIP:1075,90 ml:545,60 ml:370,30 ml:190
+Vat 69|Scotch|NIP:1045,90 ml:530,60 ml:360,30 ml:185
+100 Pipers|Scotch|NIP:1090,90 ml:550,60 ml:375,30 ml:195
+Dewar's White Label|Scotch|NIP:935,90 ml:475,60 ml:325,30 ml:170
+William Lawson's|Scotch|NIP:745,90 ml:380,60 ml:260,30 ml:135`),
+  barSection('premium-whiskey', 'Premium Whiskey', 'NIP 180 ml · 90 ml · 60 ml · 30 ml', 'maroon', `
+Blender's Pride Reserve|Whiskey|NIP:695,90 ml:355,60 ml:245,30 ml:130
+Antiquity Blue|Whiskey|NIP:710,90 ml:360,60 ml:245,30 ml:130
+Oaksmith Gold|Whiskey|NIP:660,90 ml:335,60 ml:230,30 ml:120
+Blender's Pride|Whiskey|NIP:630,90 ml:320,60 ml:220,30 ml:115
+Legacy Premium|Whiskey|NIP:580,90 ml:295,60 ml:205,30 ml:110
+Signature Premium|Whiskey|NIP:630,90 ml:320,60 ml:220,30 ml:115
+Signature Rare|Whiskey|NIP:630,90 ml:320,60 ml:220,30 ml:115
+Sterling B10|Whiskey|NIP:545,90 ml:280,60 ml:195,30 ml:105
+American Pride|Whiskey|NIP:605,90 ml:310,60 ml:215,30 ml:115
+MCD Platinum|Whiskey|NIP:430,90 ml:220,60 ml:155,30 ml:85
+Oaksmith Silver|Whiskey|NIP:545,90 ml:280,60 ml:195,30 ml:105
+Royal Stag Barrel|Whiskey|NIP:495,90 ml:255,60 ml:175,30 ml:95
+Royal Stag Dark|Whiskey|NIP:465,90 ml:240,60 ml:165,30 ml:90
+Royal Green|Whiskey|NIP:430,90 ml:220,60 ml:155,30 ml:85`),
+  barSection('regular-whiskey', 'Regular Whiskey', 'NIP 180 ml · 90 ml · 60 ml · 30 ml', 'maroon', `
+Royal Challenge|Whiskey|NIP:430,90 ml:220,60 ml:155,30 ml:85
+Royal Stag|Whiskey|NIP:415,90 ml:215,60 ml:150,30 ml:80
+Sterling B7|Whiskey|NIP:430,90 ml:220,60 ml:155,30 ml:85
+MCD Luxury|Whiskey|NIP:380,90 ml:195,60 ml:135,30 ml:75
+Iconiq White|Whiskey|NIP:380,90 ml:195,60 ml:135,30 ml:75
+Imperial Blue|Whiskey|NIP:365,90 ml:190,60 ml:135,30 ml:75
+MCD No1|Whiskey|NIP:365,90 ml:190,60 ml:135,30 ml:75
+Green Label|Whiskey|NIP:365,90 ml:190,60 ml:135,30 ml:75
+OC Blue|Whiskey|NIP:265,90 ml:140,60 ml:100,30 ml:55
+DSP Black|Whiskey|NIP:350,90 ml:180,60 ml:125,30 ml:70
+DSP|Whiskey|NIP:225,90 ml:120,60 ml:85,30 ml:50
+OC|Whiskey|NIP:365,90 ml:190,60 ml:135,30 ml:75
+BP|Whiskey|NIP:350,90 ml:180,60 ml:125,30 ml:70
+8 P.M.|Whiskey|NIP:330,90 ml:170,60 ml:120,30 ml:65
+Hayward|Whiskey|NIP:330,90 ml:170,60 ml:120,30 ml:65`),
+  barSection('brandy', 'Brandy', 'NIP 180 ml · 90 ml · 60 ml · 30 ml', 'maroon', `
+Manson House|Brandy|NIP:405,90 ml:210,60 ml:145,30 ml:80
+Reserve No 1|Brandy|NIP:300,90 ml:155,60 ml:110,30 ml:60
+Honey Bee|Brandy|NIP:290,90 ml:150,60 ml:105,30 ml:60
+Dr Brady|Brandy|NIP:330,90 ml:170,60 ml:120,30 ml:65`),
+  barSection('rum', 'Rum', 'NIP 180 ml · 90 ml · 60 ml · 30 ml', 'maroon', `
+Bacardi Lemon|Rum|NIP:670,90 ml:340,60 ml:235,30 ml:125
+Bacardi White|Rum|NIP:645,90 ml:330,60 ml:225,30 ml:120
+Bacardi Black|Rum|NIP:415,90 ml:215,60 ml:150,30 ml:80
+Captain Morgan|Rum|NIP:280,90 ml:145,60 ml:105,30 ml:60
+Old Monk|Rum|NIP:355,90 ml:185,60 ml:130,30 ml:70
+MCD Rum|Rum|NIP:340,90 ml:175,60 ml:125,30 ml:70
+Imperial Red Rim|Rum|NIP:225,90 ml:120,60 ml:85,30 ml:50`),
+  barSection('gin', 'Gin', 'NIP 180 ml · 90 ml · 60 ml · 30 ml', 'maroon', 'Blue Riband|Gin|NIP:365,90 ml:190,60 ml:135,30 ml:75'),
+  barSection('vodka', 'Vodka', 'NIP 180 ml · 90 ml · 60 ml · 30 ml', 'maroon', `
+Absolut Vodka|Vodka|NIP:1075,90 ml:545,60 ml:370,30 ml:190
+Smirnoff Flavored|Vodka|NIP:670,90 ml:340,60 ml:235,30 ml:125
+Smirnoff Plaine|Vodka|NIP:645,90 ml:330,60 ml:225,30 ml:120
+Grand Master|Vodka|NIP:495,90 ml:255,60 ml:175,30 ml:95
+Magic Moment Flavored|Vodka|NIP:465,90 ml:240,60 ml:165,30 ml:90
+Magic Moment|Vodka|NIP:465,90 ml:240,60 ml:165,30 ml:90
+Fuel|Vodka|NIP:300,90 ml:155,60 ml:110,30 ml:60
+White Mishaps|Vodka|NIP:465,90 ml:240,60 ml:165,30 ml:90
+Romano Flavored|Vodka|NIP:365,90 ml:190,60 ml:135,30 ml:75
+Romano Plaine|Vodka|NIP:365,90 ml:190,60 ml:135,30 ml:75
+Haywards|Vodka|NIP:330,90 ml:170,60 ml:120,30 ml:65`),
+  barSection('beer-strong', 'Beer Strong', '650 ml · 500 ml · 330 ml', 'maroon', `
+Budweiser|Beer|650 ml:415,500 ml:330,330 ml:255
+Carlsberg|Beer|650 ml:415,500 ml:330,330 ml:255
+Bira Rice|Beer|650 ml:380,330 ml:255
+Bira 91 Gold|Beer|650 ml:350,500 ml:300,330 ml:250
+Copter 7|Beer|650 ml:315,500 ml:250
+Bira 91 Boom|Beer|650 ml:315,500 ml:240
+Tuborg|Beer|650 ml:325,500 ml:250,330 ml:200
+KF|Beer|650 ml:315,500 ml:240,330 ml:190
+LP|Beer|650 ml:275,500 ml:225,330 ml:180`),
+  barSection('beer-mild', 'Beer Mild', '650 ml · 500 ml · 330 ml', 'maroon', `
+Bira 91 White|Beer|650 ml:380,500 ml:330,330 ml:250
+Carlsberg|Beer|650 ml:395,500 ml:315,330 ml:215
+Budweiser|Beer|650 ml:405,500 ml:315,330 ml:215
+Tuborg Ice|Beer|650 ml:365,500 ml:290
+Bira 91 Blonde|Beer|650 ml:330,500 ml:280,330 ml:205
+Copter 7|Beer|650 ml:315,500 ml:250
+Tuborg|Beer|650 ml:330,500 ml:255,330 ml:200
+KF|Beer|650 ml:330,500 ml:240,330 ml:205
+LP|Beer|650 ml:230,500 ml:165,330 ml:150`),
+  barSection('wine', 'Wine', 'NIP 180 ml · 90 ml', 'maroon', `
+Sula Red|Wine|NIP:515,90 ml:265
+Sula White|Wine|NIP:330,90 ml:170
+Madira|Wine|NIP:185,90 ml:100
+Dia Red|Wine|NIP:175,90 ml:95
+Port|Wine|NIP:175,90 ml:95`),
+  barSection('ready-to-drink', 'Ready To Drink', 'NIP 180 ml', 'maroon', `
+BS TRD Can|Ready to drink|NIP:580
+Breezer Bliss|Ready to drink|NIP:250
+Breezer|Ready to drink|NIP:250`),
+  barSection('cold-drinks', 'Cold Drinks', 'Bottles and soft drinks', 'green', `
+Cold 750 ml|Cold drink|Price:70
+Cold 300 ml|Cold drink|Price:45
+Cold 250 ml|Cold drink|Price:35
+Cold 200 ml|Cold drink|Price:20
+Soda 750 ml|Soda|Price:40
+Soda 300 ml|Soda|Price:20
+Mineral Water 1000 ml|Mineral water|Price:30
+Mineral Water 500 ml|Mineral water|Price:20`),
 ]
