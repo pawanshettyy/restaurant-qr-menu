@@ -853,6 +853,182 @@ const barSection = (slug: string, title: string, tagline: string, tone: 'maroon'
   items: barItems(text),
 })
 
+const normalizeDrinkName = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .replace(/_+/g, '_')
+
+const toDrinkPrices = (values: Array<number | null>, sizes = ['180 ml', '90 ml', '60 ml', '30 ml']): Price[] =>
+  values.flatMap((value, index) => {
+    if (value == null) return []
+    return [{ label: values.length === 1 ? undefined : sizes[index] ?? undefined, value }]
+  })
+
+const NON_AC_DRINK_PRICES: Record<string, Record<string, Array<number | null>>> = {
+  scotch: {
+    dewars_12_year: [1350, 680, 460, 235],
+    black_dog_12_year: [1185, 600, 405, 210],
+    teachers: [1020, 515, 350, 180],
+    black_white: [985, 500, 340, 175],
+    ballantine: [1020, 515, 350, 180],
+    jb: [975, 495, 335, 175],
+    red_label: [975, 495, 335, 175],
+    black_dog: [null, null, null, null],
+    vat_69: [945, 480, 325, 170],
+    '100_pipers': [990, 500, 340, 175],
+    dewars_white_label: [850, 430, 295, 155],
+    william_lawsons: [675, 345, 235, 125],
+  },
+  'premium-whiskey': {
+    blenders_pride_reserve: [630, 320, 220, 115],
+    antiquity_blue: [645, 330, 225, 120],
+    oaksmith_gold: [600, 305, 210, 110],
+    blenders_pride: [570, 290, 200, 105],
+    legacy_premium: [525, 270, 185, 100],
+    signature_premium: [570, 290, 200, 105],
+    signature_rare: [570, 290, 200, 105],
+    sterling_b10: [495, 255, 175, 95],
+    american_pride: [550, 280, 195, 105],
+    mcd_platinum: [390, 200, 140, 75],
+    oaksmith_silver: [495, 255, 175, 95],
+    royalstag_barrel: [450, 230, 160, 85],
+    rstag_dark: [420, 215, 150, 80],
+    royal_green: [390, 200, 140, 75],
+  },
+  'regular-whiskey': {
+    royal_challenge: [390, 200, 140, 75],
+    royal_stag: [375, 195, 135, 75],
+    sterling_b7: [390, 200, 140, 75],
+    mcd_luxury: [345, 180, 125, 70],
+    iconiq_white: [345, 180, 125, 70],
+    imperial_blue: [330, 170, 120, 65],
+    mcd_no_1: [330, 170, 120, 65],
+    green_label: [330, 170, 120, 65],
+    oc_blue: [240, 125, 90, 50],
+    dsp_black: [315, 165, 115, 65],
+    dsp: [205, 110, 80, 45],
+    oc: [330, 170, 120, 65],
+    bp: [315, 165, 115, 65],
+    '8_pm': [300, 155, 110, 60],
+    hayward: [300, 155, 110, 60],
+  },
+  brandy: {
+    manson_house: [370, 190, 135, 75],
+    reserve_no_1: [270, 140, 100, 55],
+    honey_bee: [265, 140, 100, 55],
+    dr_brandy: [260, 155, 110, 60],
+  },
+  rum: {
+    bacardi_lemon: [610, 310, 215, 115],
+    bacardi_white: [585, 300, 205, 110],
+    bacardi_black: [375, 195, 135, 75],
+    captain_morgan: [255, 135, 95, 50],
+    old_monk: [325, 170, 120, 65],
+    mcd_rum: [310, 160, 115, 65],
+    imperial_red_rum: [205, 110, 80, 45],
+  },
+  gin: {
+    blue_riband_duet: [330, 170, 120, 65],
+  },
+  vodka: {
+    absolut_vodka: [975, 495, 335, 180],
+    smirnoff_flavored: [610, 310, 215, 115],
+    smirnoff_plain: [585, 300, 205, 110],
+    grand_master: [450, 230, 160, 85],
+    magic_moment_flavored: [420, 215, 150, 80],
+    magic_moment: [420, 215, 150, 80],
+    fuel: [270, 140, 100, 55],
+    white_mishaps: [270, 140, 100, 55],
+    romano_flavored: [420, 215, 150, 80],
+    romano_plain: [330, 170, 120, 65],
+    haywards_vodka: [300, 155, 110, 60],
+  },
+  'beer-strong': {
+    budweiser: [375, 300, 235],
+    carlsberg: [375, 300, 235],
+    bira_rice: [345, 300, 235],
+    bira_91_gold: [315, 270, 225],
+    copter_7: [315, 270, 225],
+    bira_91_boom: [285, 225, null],
+    tuborg: [285, 225, null],
+    kf: [295, 225, 180],
+    lp: [285, 220, 180],
+    beer_strong: [250, 205, 165],
+  },
+  'beer-mild': {
+    bira_91_white: [345, 300, 225],
+    carlsberg: [360, 300, 225],
+    budweiser: [370, 285, 195],
+    tuborg_ice: [330, 285, 195],
+    bira_91_blond: [300, 265, null],
+    copter_7: [285, 255, 190],
+    tuborg: [300, 225, 190],
+    kf: [300, 235, 180],
+    lp: [300, 220, 180],
+  },
+  wine: {
+    sula_red: [465, 240],
+    sula_white: [300, 155],
+    madira: [170, 90],
+    dia_red: [160, 85],
+    port: [160, 85],
+  },
+  'ready-to-drink': {
+    bs_trd_can: [525],
+    breezer_bliss: [225],
+    breezer: [225],
+  },
+  'cold-drinks': {
+    cold_750: [60],
+    cold_300: [40],
+    cold_250: [30],
+    cold_200: [15],
+    soda_750: [30],
+    soda_300: [15],
+    mineral_water_1l: [25],
+    mineral_water_500: [15],
+  },
+}
+
+const DRINK_NAME_ALIASES: Record<string, string> = {
+  dewars: 'dewars_12_year',
+  teacher_s: 'teachers',
+  william_lawson_s: 'william_lawsons',
+  black_dog_centenary: 'black_dog_12_year',
+  black_dog_12_year: 'black_dog_12_year',
+  black_dog: 'black_dog',
+  vat_69: 'vat_69',
+  '100_pipers': '100_pipers',
+  royal_stag_barrel: 'royalstag_barrel',
+  rstag_dark: 'rstag_dark',
+  royal_challenge: 'royal_challenge',
+  mcd_no1: 'mcd_no_1',
+  mcd_no_1: 'mcd_no_1',
+  dr_brady: 'dr_brandy',
+  dr_brandy: 'dr_brandy',
+  imperial_red_rim: 'imperial_red_rum',
+  blue_riband_duet: 'blue_riband_duet',
+  blue_riband: 'blue_riband_duet',
+  smirnoff_plaine: 'smirnoff_plain',
+  romano_plaine: 'romano_plain',
+  haywards_vodka: 'haywards_vodka',
+  beer_strong: 'beer_strong',
+  bira_91_blonde: 'bira_91_blond',
+  birav_91_blond: 'bira_91_blond',
+  cold_750: 'cold_750',
+  cold_300: 'cold_300',
+  cold_250: 'cold_250',
+  cold_200: 'cold_200',
+  soda_750: 'soda_750',
+  soda_300: 'soda_300',
+  mineral_water_1000_ml: 'mineral_water_1l',
+  mineral_water_1l: 'mineral_water_1l',
+  mineral_water_500_ml: 'mineral_water_500',
+  mineral_water_500: 'mineral_water_500',
+}
+
 export const DRINKS: DrinkSection[] = [
   barSection('scotch', 'Scotch', 'NIP 180 ml · 90 ml · 60 ml · 30 ml', 'maroon', `
 Dewar's 12 Year|Scotch|NIP:1490,90 ml:750,60 ml:505,30 ml:260
@@ -964,3 +1140,15 @@ Soda 300 ml|Soda|Price:20
 Mineral Water 1000 ml|Mineral water|Price:30
 Mineral Water 500 ml|Mineral water|Price:20`),
 ]
+
+for (const section of DRINKS) {
+  const pricing = NON_AC_DRINK_PRICES[section.slug]
+  if (!pricing) continue
+
+  for (const item of section.items) {
+    const key = normalizeDrinkName(item.name)
+    const canonical = DRINK_NAME_ALIASES[key] ?? key
+    const prices = pricing[canonical]
+    if (prices) item.nonAcPrices = toDrinkPrices(prices)
+  }
+}
