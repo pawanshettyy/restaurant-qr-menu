@@ -23,20 +23,20 @@ import { DIET_META, DRINKS, FOOD, type Category, type Diet, type Item, type Pric
 
 const IMG = {
   hero: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/home.png',
-  food: 'https://images.unsplash.com/photo-1789990642068-0840cf55e1cf?w=900&h=500&fit=crop&auto=format',
-  bar: 'https://images.unsplash.com/photo-1778104960251-b1d82ac92ee9?w=900&h=500&fit=crop&auto=format',
+  food: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/food.avif',
+  bar: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/bar.avif',
 }
 
 const CATEGORY_PHOTO: Record<string, { src: string; alt: string; tag: string }> = {
-  'soup': { src: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=900&h=500&fit=crop&auto=format', alt: 'Bowl of steaming soup', tag: 'Served piping hot' },
-  'starter': { src: 'https://images.unsplash.com/photo-1666001120694-3ebe8fd207be?w=900&h=500&fit=crop&auto=format', alt: 'Plate of grilled paneer tikka starters', tag: 'Small plates to share' },
-  'tandoor-se': { src: 'https://images.unsplash.com/photo-1705359573325-f2006d5e459f?w=900&h=500&fit=crop&auto=format', alt: 'Chicken and vegetable skewers on the grill', tag: 'Straight from the clay oven' },
-  'main-course': { src: 'https://images.unsplash.com/photo-1789990642068-0840cf55e1cf?w=900&h=500&fit=crop&auto=format', alt: 'Metal bowl of curry with fried bread', tag: 'Made for sharing' },
-  'roti-ka-khazana': { src: 'https://images.unsplash.com/photo-1697155406014-04dc649b0953?w=900&h=500&fit=crop&auto=format', alt: 'Bowl of fresh naan bread', tag: 'Fresh from the tandoor' },
-  'basmati-ki-bahar': { src: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=900&h=500&fit=crop&auto=format', alt: 'Bowl of biryani rice with meat', tag: 'Slow-dum biryani' },
-  'chinese-ka-tadka': { src: 'https://images.unsplash.com/photo-1603496987351-f84a3ba5ec85?w=900&h=500&fit=crop&auto=format', alt: 'Indo-Chinese chilli chicken with peppers', tag: 'Wok-fired favourites' },
-  'chinese-rice-noodles': { src: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=900&h=500&fit=crop&auto=format', alt: 'Stir-fried noodles with vegetables', tag: 'Wok-tossed classics' },
-  'khane-ke-saath': { src: 'https://images.unsplash.com/photo-1635704181144-d44f380e623c?w=900&h=500&fit=crop&auto=format', alt: 'Wooden bowl of salad and accompaniments', tag: 'Fresh on the side' },
+  'soup': { src: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/soup.avif', alt: 'Bowl of steaming soup', tag: 'Served piping hot' },
+  'starter': { src: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/starter.avif', alt: 'Plate of grilled paneer tikka starters', tag: 'Small plates to share' },
+  'tandoor-se': { src: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/tandoor-se.avif', alt: 'Chicken and vegetable skewers on the grill', tag: 'Straight from the clay oven' },
+  'main-course': { src: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/main-course.avif', alt: 'Metal bowl of curry with fried bread', tag: 'Made for sharing' },
+  'roti-ka-khazana': { src: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/roti-ka-khazana.avif', alt: 'Bowl of fresh naan bread', tag: 'Fresh from the tandoor' },
+  'basmati-ki-bahar': { src: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/basmati-ki-bahar.avif', alt: 'Bowl of biryani rice with meat', tag: 'Slow-dum biryani' },
+  'chinese-ka-tadka': { src: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/chinese-ka-tadka.avif', alt: 'Indo-Chinese chilli chicken with peppers', tag: 'Wok-fired favourites' },
+  'chinese-rice-noodles': { src: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/chinese-rice-noodles.avif', alt: 'Stir-fried noodles with vegetables', tag: 'Wok-tossed classics' },
+  'khane-ke-saath': { src: 'https://zolgy7uag9sbwkfm.public.blob.vercel-storage.com/khaane-ke-sath.avif', alt: 'Wooden bowl of salad and accompaniments', tag: 'Fresh on the side' },
 }
 
 const ICONS: Record<string, typeof Soup> = {
