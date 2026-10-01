@@ -19,6 +19,7 @@ import {
   Wine,
   X,
 } from 'lucide-react'
+import { SECTION, SECTION_LABEL } from './section'
 import { DIET_META, DRINKS, FOOD, type Category, type Diet, type Item, type Price } from './menu'
 
 const IMG = {
@@ -65,11 +66,11 @@ function useRoute() {
   }, [])
   return route
 }
+
 const go = (path: string) => {
   window.location.hash = '/' + path
 }
 
-/* ---------- shared bits ---------- */
 function Diamonds() {
   return (
     <div className="flex justify-between px-1 py-4 text-[#f0cdb8]" aria-hidden>
@@ -202,7 +203,7 @@ function FoodRow({ item }: { item: Item }) {
         {item.desc && <p className="mt-0.5 text-[12.5px] leading-snug text-faint">{item.desc}</p>}
       </div>
       <div className="pt-px text-right">
-        <PriceView prices={item.prices} />
+        <PriceView prices={SECTION === 'nonac' && item.nonAcPrices !== undefined ? item.nonAcPrices : item.prices} />
       </div>
     </li>
   )
@@ -256,9 +257,12 @@ function ReviewButton() {
   )
 }
 
-function Shell({ children }: { children: ReactNode }) {
+function Shell({ children, showVat = false }: { children: ReactNode; showVat?: boolean }) {
   return (
     <div className="mx-auto min-h-screen w-full max-w-[480px] px-5 pt-[calc(env(safe-area-inset-top)+2rem)] pb-12">
+      <p className="mb-4 text-center text-[10.5px] font-medium tracking-[0.12em] text-clay uppercase">
+        Prices shown: {SECTION_LABEL[SECTION]}{showVat && ' · VAT 10%'}
+      </p>
       {children}
       <footer className="mt-8 space-y-4">
         <ReviewButton />
@@ -313,6 +317,7 @@ function ContactInfo() {
       <p>Shop No. 5,6,7 Pereira Shopping Center, Sweet Sahara Complex,</p>
       <p>St. Mary&apos;s Road, Pereira Nagar, Naigaon East,</p>
       <p>Sarjamori, Vasai-Virar, Maharashtra 401208, India.</p>
+      <p className="mt-3 text-[10.5px]">Source: Vasai Taluka Hotel Association (Reg. No. KUA/Thane/489/94)</p>
     </div>
   )
 }
@@ -450,7 +455,7 @@ function FoodListing({ category }: { category: Category }) {
         ))}
         {!groups.length && <p className="py-10 text-center text-sm text-faint">Nothing matches “{q}”.</p>}
         <Note title="A note from our kitchen">
-          Prices are in ₹. APS means as per size - please ask your server. Most dishes can be adjusted for heat; tell us about nuts, dairy, gluten or other allergens.
+          Food once ordered cannot be cancelled. Rates are subject to change without prior notice. All government taxes are applicable. Prices are in ₹. APS means as per size - please ask your server. Most dishes can be adjusted for heat; tell us about nuts, dairy, gluten or other allergens.
         </Note>
       </div>
     </Shell>
@@ -466,7 +471,7 @@ function DrinksMenu() {
   })).filter((s) => s.items.length)
 
   return (
-    <Shell>
+    <Shell showVat>
       <div className="rise">
         <Header
           onBack={() => go('')}
@@ -501,7 +506,7 @@ function DrinksMenu() {
                     </p>
                     <p className="mt-0.5 text-[12.5px] leading-snug text-faint">{i.desc}</p>
                   </div>
-                  <span className="text-[15px] font-medium tabular-nums">₹{i.price}</span>
+                  <PriceView prices={SECTION === 'nonac' && i.nonAcPrices !== undefined ? i.nonAcPrices : i.prices} />
                 </li>
               ))}
             </ul>
@@ -509,7 +514,7 @@ function DrinksMenu() {
         ))}
         {!sections.length && <p className="py-10 text-center text-sm text-faint">Nothing matches “{q}”.</p>}
         <Note title="Responsible service">
-          Only patrons above 25 will be served alcohol. Measures are listed before dilution; standard mixers are complimentary.
+          Only patrons above 25 will be served alcohol. Measures are listed before dilution.
         </Note>
       </div>
     </Shell>

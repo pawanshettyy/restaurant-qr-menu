@@ -1,0 +1,129 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index 10066ba..95a0b6e 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -19,6 +19,7 @@ import {
+   Wine,
+   X,
+ } from 'lucide-react'
++import { SECTION, SECTION_LABEL } from './section'
+ import { DIET_META, DRINKS, FOOD, type Category, type Diet, type Item, type Price } from './menu'
+ 
+ const IMG = {
+@@ -202,7 +203,7 @@ function FoodRow({ item }: { item: Item }) {
+         {item.desc && <p className="mt-0.5 text-[12.5px] leading-snug text-faint">{item.desc}</p>}
+       </div>
+       <div className="pt-px text-right">
+-        <PriceView prices={item.prices} />
++        <PriceView prices={SECTION === 'nonac' && item.nonAcPrices !== undefined ? item.nonAcPrices : item.prices} />
+       </div>
+     </li>
+   )
+@@ -259,6 +260,7 @@ function ReviewButton() {
+ function Shell({ children }: { children: ReactNode }) {
+   return (
+     <div className="mx-auto min-h-screen w-full max-w-[480px] px-5 pt-[calc(env(safe-area-inset-top)+2rem)] pb-12">
++      <p className="mb-4 text-center text-[10.5px] font-medium tracking-[0.12em] text-clay uppercase">Prices shown: {SECTION_LABEL[SECTION]}</p>
+       {children}
+       <footer className="mt-8 space-y-4">
+         <ReviewButton />
+@@ -501,7 +503,7 @@ function DrinksMenu() {
+                     </p>
+                     <p className="mt-0.5 text-[12.5px] leading-snug text-faint">{i.desc}</p>
+                   </div>
+-                  <span className="text-[15px] font-medium tabular-nums">₹{i.price}</span>
++                  <span className="text-[15px] font-medium tabular-nums">₹{SECTION === 'nonac' && i.nonAcPrice !== undefined ? i.nonAcPrice : i.price}</span>
+                 </li>
+               ))}
+             </ul>
+diff --git a/src/menu.ts b/src/menu.ts
+index 8734012..dfeab67 100644
+--- a/src/menu.ts
++++ b/src/menu.ts
+@@ -8,8 +8,10 @@ export interface Price {
+ export interface Item {
+   name: string
+   desc?: string
+-  /** null => "APS" (as per size) */
++  /** null => "APS" (as per size). These are the AC prices. */
+   prices: Price[] | null
++  /** Non-AC prices; when undefined the AC prices apply to both sections. */
++  nonAcPrices?: Price[] | null
+   chef?: boolean
+   diet: Diet
+ }
+@@ -43,20 +45,24 @@ export const DIET_META: Record<Diet, { title: string; tagline: string; color: st
+  * Line format:  Name [| note] [*] = 140
+  *               Name = Half 270 / Full 450
+  *               Name = APS
++ *               Name = 140 ; 120          (AC ; Non-AC - omit "; ..." if same)
+  * A trailing "*" after the name marks Chef's Pick.
+  */
++function parsePrices(text: string): Price[] | null {
++  if (text.toUpperCase() === 'APS') return null
++  return text.split('/').map((part) => {
++    const m = part.trim().match(/^(?:(.*?)\s+)?(\d+)$/)
++    return { label: m?.[1] || undefined, value: Number(m?.[2]) }
++  })
++}
++
+ function parseLine(line: string, diet: Diet): Item {
+   const [left, right] = line.split('=').map((s) => s.trim())
+   const chef = /\*$/.test(left)
+   const [name, desc] = left.replace(/\*$/, '').split('|').map((s) => s.trim())
+-  let prices: Price[] | null = null
+-  if (right.toUpperCase() !== 'APS') {
+-    prices = right.split('/').map((part) => {
+-      const m = part.trim().match(/^(?:(.*?)\s+)?(\d+)$/)
+-      return { label: m?.[1] || undefined, value: Number(m?.[2]) }
+-    })
+-  }
+-  return { name, desc, prices, chef, diet }
++  const [ac, nonAc] = right.split(';').map((s) => s.trim())
++  const prices = parsePrices(ac)
++  return nonAc === undefined ? { name, desc, prices, chef, diet } : { name, desc, prices, nonAcPrices: parsePrices(nonAc), chef, diet }
+ }
+ 
+ const lines = (text: string) =>
+@@ -516,7 +522,7 @@ export interface DrinkSection {
+   title: string
+   tagline: string
+   tone: 'maroon' | 'green'
+-  items: { name: string; desc: string; price: number; chef?: boolean }[]
++  items: { name: string; desc: string; price: number; nonAcPrice?: number; chef?: boolean }[]
+ }
+ 
+ export const DRINKS: DrinkSection[] = [
+diff --git a/src/section.ts b/src/section.ts
+new file mode 100644
+index 0000000..8e6d018
+--- /dev/null
++++ b/src/section.ts
+@@ -0,0 +1,27 @@
++export type Section = 'ac' | 'nonac'
++
++export const SECTION_LABEL: Record<Section, string> = { ac: 'AC section', nonac: 'Non-AC section' }
++
++/** Used when someone opens the plain URL without scanning a table QR. */
++const DEFAULT_SECTION: Section = 'ac'
++const KEY = 'sahyadri-section'
++
++const isSection = (v: unknown): v is Section => v === 'ac' || v === 'nonac'
++
++function detect(): Section {
++  const fromUrl = new URLSearchParams(window.location.search).get('s')
++  try {
++    if (isSection(fromUrl)) {
++      sessionStorage.setItem(KEY, fromUrl)
++      return fromUrl
++    }
++    const saved = sessionStorage.getItem(KEY)
++    if (isSection(saved)) return saved
++  } catch {
++    /* storage blocked (private mode) - fall through */
++  }
++  return isSection(fromUrl) ? fromUrl : DEFAULT_SECTION
++}
++
++/** Resolved once per page load: ?s=ac | ?s=nonac, remembered for the visit. */
++export const SECTION: Section = detect()
