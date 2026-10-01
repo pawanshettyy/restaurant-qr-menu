@@ -994,6 +994,8 @@ const NON_AC_DRINK_PRICES: Record<string, Record<string, Array<number | null>>> 
 
 const DRINK_NAME_ALIASES: Record<string, string> = {
   dewars: 'dewars_12_year',
+  dewar_s_12_year: 'dewars_12_year',
+  dewar_s_white_label: 'dewars_white_label',
   teacher_s: 'teachers',
   william_lawson_s: 'william_lawsons',
   black_dog_centenary: 'black_dog_12_year',
@@ -1001,6 +1003,8 @@ const DRINK_NAME_ALIASES: Record<string, string> = {
   black_dog: 'black_dog',
   vat_69: 'vat_69',
   '100_pipers': '100_pipers',
+  blender_s_pride_reserve: 'blenders_pride_reserve',
+  blender_s_pride: 'blenders_pride',
   royal_stag_barrel: 'royalstag_barrel',
   rstag_dark: 'rstag_dark',
   royal_challenge: 'royal_challenge',
